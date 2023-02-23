@@ -10,9 +10,15 @@ export type ConsumerMessageType = ConsumeMessage | null;
 @injectable()
 export class RabbitMQ implements IMQ<ConsumerMessageType> {
   private connectionAMPQ!: ampq.Connection;
-  private channelAMPQ!: ampq.Channel;
+  public channelAMPQ!: ampq.Channel;
     
   constructor(@inject(TYPES.Config) public config: IConfigService) { }
+
+  public accept(data: ConsumerMessageType): void {
+    if (data) {
+      this.channelAMPQ.ack(data);
+    }
+  }
 
   public async connect(): Promise<void> {
     try {
