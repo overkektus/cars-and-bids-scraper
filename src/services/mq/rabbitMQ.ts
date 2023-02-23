@@ -5,8 +5,10 @@ import { IConfigService } from '../config/config.interface';
 import { TYPES } from '../../types';
 import { IMQ } from './mq.interface';
 
+export type ConsumerMessageType = ConsumeMessage | null;
+
 @injectable()
-export class RabbitMQ implements IMQ {
+export class RabbitMQ implements IMQ<ConsumerMessageType> {
   private connectionAMPQ!: ampq.Connection;
   private channelAMPQ!: ampq.Channel;
     
@@ -29,8 +31,8 @@ export class RabbitMQ implements IMQ {
   public sendData<T>(queueName: string, data: T): void {
     this.channelAMPQ.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
   }
-
-  public setConsume(queueName: string, consumer: (msg: ConsumeMessage | null) => void): void {
+  
+  public setConsume(queueName: string, consumer: (msg: ConsumerMessageType) => void): void {
     this.channelAMPQ.consume(queueName, consumer);
   }
 
