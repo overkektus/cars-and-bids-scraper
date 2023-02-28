@@ -20,9 +20,9 @@ export class RabbitMQ implements IMQ<ConsumerMessageType> {
     }
   }
 
-  public async connect(): Promise<void> {
+  public async connect(uri: string): Promise<void> {
     try {
-      this.connectionAMPQ = await ampq.connect(this.config.get('RABBITMQ_URL'));
+      this.connectionAMPQ = await ampq.connect(uri);
       this.channelAMPQ = await this.connectionAMPQ.createChannel();
     } catch(error) {
       console.log(error);
@@ -38,11 +38,11 @@ export class RabbitMQ implements IMQ<ConsumerMessageType> {
     this.channelAMPQ.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
   }
   
-  public setConsume(queueName: string, consumer: (msg: ConsumerMessageType) => void): void {
+  public async setConsume(queueName: string, consumer: (msg: ConsumerMessageType) => void): Promise<void> {
     this.channelAMPQ.consume(queueName, consumer);
   }
 
-  public assertQueue(queueName: string): void {
+  public async assertQueue(queueName: string): Promise<void> {
     this.channelAMPQ.assertQueue(queueName);
   }
 }
